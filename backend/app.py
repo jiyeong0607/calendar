@@ -91,11 +91,9 @@ def update_todo(todo_id):
     db.session.commit()
     return jsonify(success=True)
 
-# 테이블 자동 생성
-@app.before_first_request
-def create_tables():
-    db.create_all()
 
 # 서버 시작
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
     app.run(host="0.0.0.0", port=5000)
