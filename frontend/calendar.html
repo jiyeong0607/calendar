@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>캘린더</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #fff;
+      padding: 20px;
+    }
+    .calendar-container {
+      max-width: 500px;
+      margin: auto;
+      text-align: center;
+    }
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      width: 14.2%;
+      padding: 10px;
+      border: 1px solid #ddd;
+     }
+    td:hover {
+	    background-color: #f0f0f0;
+	    cursor: pointer;
+     }
+  </style>
+</head>
+<body>
+  <div class="calendar-container">
+    <div class="calendar-header">
+      <button onclick="prevMonth()">←</button>
+      <h2 id="monthTitle"></h2> <!--js로 불러와서 채움-->
+      <button onclick="nextMonth()">-></button>
+    </div>
+    <table>
+      <thead> <!--요일을 thead 안에 고정-->
+        <tr>
+          <th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th>
+        </tr>
+      </thead>
+      <tbody id="calendarBody"></tbody> <!--달력칸은 calendarBody안에서 생성-->
+    </table>
+  </div>
+
+  <!-- 상세 일정 팝업 -->
+  <div id="popup" class="popup" style="display:none; position:fixed; top:20%; left:30%; background:white; border:1px solid #ccc; padding:20px;">
+    <span style="float:right; cursor:pointer;" onclick="closePopup()">X</span>
+    <h3 id="popupTitle"></h3>
+    <h4>할 일 목록</h4>
+    <ul id="todoList"></ul>
+    <input id="newTodo" placeholder="할 일 입력" style="width: 80%; margin-top: 10px;"> <!--popup.js 안에 onclick어쩌구랑 연결됨-->
+    <button id="addTodoBtn" style="width: 15%;">추가</button>
+  </div>
+
+  <script src="calendar.js"></script> <!-- 이 두 js파일과 연결됨--> 
+  <script src="popup.js"></script>
+</body>
+</html>
