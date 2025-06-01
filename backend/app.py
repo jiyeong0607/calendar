@@ -1,22 +1,15 @@
-from flask import Flask, request, jsonify
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, request, jsonify, send_from_directory
 import pandas as pd
 import os
 
-from models import db, User, ToDo
-
 app = Flask(__name__)
 
-# SQLite DB 설정
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db/app.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db.init_app(app)
+# 절대경로로 CSV 파일 위치 지정
+basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+CSV_USER_PATH = os.path.join(basedir, 'db', 'user.csv')
+CSV_TODO_PATH = os.path.join(basedir, 'db', 'todolist.csv')
 
-# CSV 경로 설정
-CSV_USER_PATH = '/app/db/user.csv'
-CSV_TODO_PATH = '/app/db/todolist.csv'
-
-# 로그인 API
+# 로그인 API (CSV에서 확인)
 @app.route('/api/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -25,7 +18,7 @@ def login():
 
     try:
         df = pd.read_csv(CSV_USER_PATH, dtype=str)
-    except Exception as e:
+    except Exception:
         return jsonify(success=False, error="파일 읽기 실패")
 
     user = df[(df['student_id'] == student_id) & (df['password'] == password)]
@@ -34,7 +27,7 @@ def login():
     else:
         return jsonify(success=False)
 
-# 일정 등록 → 자동 ToDo 추가
+# 일정 등록 → 자동 ToDo 추가 (CSV에 저장)
 @app.route('/api/schedule', methods=['POST'])
 def add_schedule():
     data = request.get_json()
@@ -42,58 +35,125 @@ def add_schedule():
     date = str(data.get("date"))
     title = str(data.get("title"))
 
-    user = User.query.filter_by(student_id=student_id).first()
-    if not user:
+    try:
+        users_df = pd.read_csv(CSV_USER_PATH, dtype=str)
+    except Exception:
+        return jsonify(success=False, error="사용자 파일 읽기 실패")
+
+    if users_df[users_df['student_id'] == student_id].empty:
         return jsonify(success=False, error="사용자 없음"), 404
 
-    todo = ToDo(user_id=user.student_id, title=f"[일정] {title}", due_date=date)
-    db.session.add(todo)
-    db.session.commit()
+    try:
+        todos_df = pd.read_csv(CSV_TODO_PATH, dtype=str)
+    except FileNotFoundError:
+        todos_df = pd.DataFrame(columns=['id', 'user_id', 'title', 'due_date', 'is_done'])
+    except Exception:
+        return jsonify(success=False, error="ToDo 파일 읽기 실패")
+
+    if todos_df.empty:
+        new_id = 1
+    else:
+        new_id = todos_df['id'].astype(int).max() + 1
+
+    new_todo = {
+        'id': str(new_id),
+        'user_id': student_id,
+        'title': f"[일정] {title}",
+        'due_date': date,
+        'is_done': 'False'
+    }
+
+    todos_df = todos_df.append(new_todo, ignore_index=True)
+    todos_df.to_csv(CSV_TODO_PATH, index=False)
 
     return jsonify(success=True)
 
-# ✅ 할일 목록 불러오기
+# 할일 목록 불러오기 (특정 날짜)
 @app.route('/api/todos', methods=['GET'])
 def get_todos():
     date = request.args.get("date")
-    todos = ToDo.query.filter_by(due_date=date).all()
+
+    try:
+        todos_df = pd.read_csv(CSV_TODO_PATH, dtype=str)
+    except Exception:
+        return jsonify([])
+
+    filtered = todos_df[todos_df['due_date'] == date]
+
     result = []
-    for t in todos:
+    for _, row in filtered.iterrows():
         result.append({
-            "id": t.id,
-            "content": t.title,
-            "is_done": str(t.is_done).lower()
+            "id": int(row['id']),
+            "content": row['title'],
+            "is_done": row['is_done'].lower() == 'true'
         })
+
     return jsonify(result)
 
-# ✅ 할일 추가
+# 할일 추가 (CSV에 저장)
 @app.route('/api/todos', methods=['POST'])
 def create_todo():
     data = request.get_json()
-    todo = ToDo(
-        title=data["content"],
-        due_date=data["date"],
-        is_done=False,
-        user_id="temp_user"  # 임시 ID → 실제로는 로그인 사용자 ID로 대체
-    )
-    db.session.add(todo)
-    db.session.commit()
+
+    try:
+        todos_df = pd.read_csv(CSV_TODO_PATH, dtype=str)
+    except FileNotFoundError:
+        todos_df = pd.DataFrame(columns=['id', 'user_id', 'title', 'due_date', 'is_done'])
+    except Exception:
+        return jsonify(success=False, error="ToDo 파일 읽기 실패")
+
+    if todos_df.empty:
+        new_id = 1
+    else:
+        new_id = todos_df['id'].astype(int).max() + 1
+
+    new_todo = {
+        'id': str(new_id),
+        'user_id': "temp_user",  # TODO: 로그인 사용자 ID로 교체 필요
+        'title': data.get("content", ""),
+        'due_date': data.get("date", ""),
+        'is_done': 'False'
+    }
+
+    todos_df = todos_df.append(new_todo, ignore_index=True)
+    todos_df.to_csv(CSV_TODO_PATH, index=False)
+
     return jsonify(success=True)
 
-# ✅ 할일 완료 상태 변경
+# 할일 완료 상태 변경 (CSV 수정)
 @app.route('/api/todos/<int:todo_id>', methods=['PATCH'])
 def update_todo(todo_id):
     data = request.get_json()
-    todo = ToDo.query.get(todo_id)
-    if not todo:
+    try:
+        todos_df = pd.read_csv(CSV_TODO_PATH, dtype=str)
+    except Exception:
+        return jsonify(success=False, error="ToDo 파일 읽기 실패")
+
+    index = todos_df.index[todos_df['id'].astype(int) == todo_id]
+    if index.empty:
         return jsonify(success=False), 404
-    todo.is_done = data["is_done"]
-    db.session.commit()
+
+    is_done = data.get("is_done")
+    if isinstance(is_done, bool):
+        is_done_str = 'True' if is_done else 'False'
+    elif isinstance(is_done, str):
+        is_done_str = is_done.capitalize()
+    else:
+        is_done_str = 'False'
+
+    todos_df.at[index[0], 'is_done'] = is_done_str
+    todos_df.to_csv(CSV_TODO_PATH, index=False)
+
     return jsonify(success=True)
 
+# 정적 파일 제공 (frontend 디렉토리)
+@app.route('/')
+def serve_login():
+    return send_from_directory('frontend', 'login.html')
 
-# 서버 시작
+@app.route('/<path:path>')
+def serve_static_file(path):
+    return send_from_directory('frontend', path)
+
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
     app.run(host="0.0.0.0", port=5000)
