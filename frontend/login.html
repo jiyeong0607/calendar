@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>로그인</title>
+  <style>
+    :root {
+      --green: #2e8b57;
+      --ivory: #fdf6e3;
+      --pastel-bg: #fafaf5;
+      --border: #b5c9b4;
+    }
+
+    @keyframes fadeSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--pastel-bg);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      animation: fadeSlideIn 1s ease-out;
+    }
+
+    .login-box {
+      background: var(--ivory);
+      padding: 30px 25px;
+      border: 2px solid var(--border);
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+      width: 320px;
+      text-align: center;
+      animation: fadeSlideIn 1.2s ease-out;
+    }
+
+    .login-box h2 {
+      color: var(--green);
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-sizing: border-box;
+      background: white;
+      transition: border 0.3s ease;
+    }
+
+    input:focus {
+      outline: none;
+      border: 2px solid var(--green);
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 15px;
+      background-color: var(--green);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    button:hover {
+      background-color: #276748;
+      transform: scale(1.02);
+    }
+
+    #loginResult {
+      color: red;
+      margin-top: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h2>로그인</h2>
+    <input id="studentId" placeholder="학번 입력">
+    <input id="password" type="password" placeholder="비밀번호 입력">
+    <button onclick="login()">로그인</button>
+    <p id="loginResult"></p>
+  </div>
+
+  <script src="login.js?v=9999"></script>
+</body>
+</html>
+

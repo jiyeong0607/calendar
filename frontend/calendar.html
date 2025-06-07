@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>캘린더</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #fdfcf5; /* 상아색 */
+      color: #2f5d50; /* 진천로색 */
+      padding: 20px;
+    }
+    .calendar-container {
+      max-width: 1600px;
+      margin: auto;
+      text-align: center;
+      background-color: #ffffff;
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      min-height: 500px;
+    }
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .calendar-header button {
+      background-color: #2f5d50;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .calendar-header button:hover {
+      background-color: #3c7a6b;
+    }
+    .logout-btn {
+      background-color: #2f5d50;
+      color: #fdfcf5;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+    .logout-btn:hover {
+      background-color: #3c7a6b;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      height: 500px;
+    }
+    th, td {
+      width: 14.2%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+    td:hover {
+      background-color: #f0f0f0;
+      cursor: pointer;
+    }
+    .day-with-todo {
+      background-color: #a9dfbf !important; /* 천로색 */
+    }
+    .day-overload {
+      background-color: #f5b7b1 !important; /* 빨간색 */
+    }
+    .popup {
+      display: none;
+      position: fixed;
+      top: 20%;
+      left: 50%;
+      transform: translate(-50%, -20%);
+      background: #ffffff;
+      border: 2px solid #2f5d50;
+      border-radius: 10px;
+      padding: 20px;
+      width: 800px;
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    }
+    .popup h3, .popup h4 {
+      color: #2f5d50;
+    }
+    .popup button {
+      background-color: #2f5d50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+    #newTodo {
+      width: 100%;
+      margin-top: 10px;
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    #addTodoBtn {
+      width: 100%;
+      margin-top: 5px;
+      background-color: #2f5d50;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      margin: 5px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .todo-item span {
+      flex-grow: 1;
+      margin-left: 5px;
+    }
+    .todo-item input[type="checkbox"] {
+      margin-right: 5px;
+    }
+    .delete-btn {
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      padding: 2px 6px;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="calendar-container">
+    <div class="calendar-header">
+      <button onclick="prevMonth()">&larr;</button>
+      <h2 id="monthTitle"></h2>
+      <div>
+        <button onclick="nextMonth()">&rarr;</button>
+        <button class="logout-btn" onclick="logout()">로그아웃</button>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th>
+        </tr>
+      </thead>
+      <tbody id="calendarBody"></tbody>
+    </table>
+  </div>
+
+  <div id="popup" class="popup">
+    <span style="float:right; cursor:pointer;" onclick="closePopup()">X</span>
+    <h3 id="popupTitle"></h3>
+    <h4>할 일 목록</h4>
+    <ul id="todoList"></ul>
+    <input id="newTodo" placeholder="할 일 입력">
+    <button id="addTodoBtn">+할 일 추가</button>
+  </div>
+
+  <script>
+    function logout() {
+      localStorage.removeItem("studentId");
+      window.location.href = "login.html";
+    }
+  </script>
+  <script src="calendar.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
