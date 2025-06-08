@@ -11,7 +11,7 @@
       --border: #b5c9b4;
     }
 
-    @keyframes fadeSlideIn {
+    @keyframes fadeSlideIn { <!--애니메이션 효과-->
       from {
         opacity: 0;
         transform: translateY(20px);
@@ -92,9 +92,9 @@
 <body>
   <div class="login-box">
     <h2>로그인</h2>
-    <input id="studentId" placeholder="학번 입력">
-    <input id="password" type="password" placeholder="비밀번호 입력">
-    <button onclick="login()">로그인</button>
+  <input id="studentId" placeholder="학번 입력"> <!--학번 입력창-->
+    <input id="password" type="password" placeholder="비밀번호 입력"> <!--비밀번호 입력창-->
+    <button onclick="login()">로그인</button> <!--로그인 버튼 만들기-->
     <p id="loginResult"></p>
   </div>
 
