@@ -7,7 +7,7 @@ if (!localStorage.getItem("studentId")) {
   window.location.href = "login.html";
 }
 
-function renderCalendar(year, month) {
+function renderCalendar(year, month) { //캘린더 렌더링
   const studentId = localStorage.getItem("studentId");
   if (!studentId) return;
 
@@ -16,19 +16,19 @@ function renderCalendar(year, month) {
   monthTitle.innerText = `${year}년 ${month + 1}월`;
   calendarBody.innerHTML = "";
 
-  const firstDay = new Date(year, month, 1).getDay();
+  const firstDay = new Date(year, month, 1).getDay(); //달의 첫날 마지막날 설정
   const lastDate = new Date(year, month + 1, 0).getDate();
 
   let row = document.createElement("tr");
-  for (let i = 0; i < firstDay; i++) row.appendChild(document.createElement("td"));
+  for (let i = 0; i < firstDay; i++) row.appendChild(document.createElement("td")); //하나씩 셀 만들기
 
   for (let date = 1; date <= lastDate; date++) {
     const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(date).padStart(2, "0")}`;
-    const cell = document.createElement("td");
+    const cell = document.createElement("td"); //td로 셀 만들기
     cell.innerText = date;
     if (dateStr === todayDateStr) cell.classList.add("today");
 
-    fetch(`/api/todos?date=${dateStr}`)
+    fetch(`/api/todos?date=${dateStr}`) 
       .then(res => res.json())
       .then(todos => {
         if (todos.length > 0) {
@@ -48,7 +48,7 @@ function renderCalendar(year, month) {
     cell.onclick = () => showPopup(dateStr);
     row.appendChild(cell);
 
-    if ((firstDay + date) % 7 === 0) {
+    if ((firstDay + date) % 7 === 0) { //한 주 끝나면 행 새로
       calendarBody.appendChild(row);
       row = document.createElement("tr");
     }
@@ -60,7 +60,7 @@ function renderCalendar(year, month) {
   }
 }
 
-function prevMonth() {
+function prevMonth() { //월 뒤로 이동
   currentMonth--;
   if (currentMonth < 0) {
     currentMonth = 11;
@@ -69,13 +69,13 @@ function prevMonth() {
   renderCalendar(currentYear, currentMonth);
 }
 
-function nextMonth() {
+function nextMonth() { //월 앞으로 이동동
   currentMonth++;
   if (currentMonth > 11) {
     currentMonth = 0;
     currentYear++;
   }
-  renderCalendar(currentYear, currentMonth);
+  renderCalendar(currentYear, currentMonth); //처음 렌더링 필요
 }
 
 // 로그아웃 함수
