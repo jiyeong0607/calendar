@@ -1,4 +1,4 @@
-let selectedDate = null;
+let selectedDate = null; 
 let cachedStatusMap = {}; // 체크 상태 캐시
 
 // 팝업 열기
@@ -6,17 +6,17 @@ function showPopup(dateStr) {
   selectedDate = dateStr;
   document.getElementById("popupTitle").innerText = dateStr;
   document.getElementById("popup").style.display = "block";
-  loadTodos();
+  loadTodos(); // 할 일 불러오기
 }
 
 // 팝업 닫기
 function closePopup() {
   document.getElementById("popup").style.display = "none";
   selectedDate = null;
-  cachedStatusMap = {}; // 캐시 초기화
+  cachedStatusMap = {}; // 초기화
 }
 
-// 할 일 로드
+// 할 일 불러오기
 function loadTodos() {
   const studentId = localStorage.getItem("studentId");
   const todoList = document.getElementById("todoList");
@@ -34,11 +34,11 @@ function loadTodos() {
           });
           cachedStatusMap = statusMap;
 
-          todos.forEach(todo => {
+          todos.forEach(todo => { 
             const li = document.createElement("li");
             li.className = "todo-item";
 
-            const checkbox = document.createElement("input");
+            const checkbox = document.createElement("input"); 
             checkbox.type = "checkbox";
             checkbox.checked = statusMap[todo.id] === true;
 
@@ -66,7 +66,7 @@ function loadTodos() {
               fetch(`/api/todos/${todo.id}`, { method: "DELETE" })
                 .then(() => {
                   loadTodos();
-                  renderCalendar(currentYear, currentMonth);
+                  renderCalendar(currentYear, currentMonth); // 삭제되면 달력도 다시 그림
                 });
             };
 
@@ -79,7 +79,7 @@ function loadTodos() {
     });
 }
 
-// 일정 추가 버튼 이벤트 등록
+// 일정 추가 버튼
 window.addEventListener("DOMContentLoaded", () => {
   const addBtn = document.getElementById("addTodoBtn");
   if (addBtn) {
@@ -106,8 +106,8 @@ window.addEventListener("DOMContentLoaded", () => {
         .then(data => {
           if (data.success) {
             input.value = "";
-            loadTodos();
-            renderCalendar(currentYear, currentMonth); 색상 강조 반영
+            loadTodos(); // 추가 후 목록 다시 불러옴
+            renderCalendar(currentYear, currentMonth); // 색상 반영용
           } else {
             alert("일정 추가 실패: " + (data.error || "서버 오류"));
           }
@@ -118,4 +118,5 @@ window.addEventListener("DOMContentLoaded", () => {
     };
   }
 });
+
 
