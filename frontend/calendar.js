@@ -2,7 +2,7 @@ let currentYear = new Date().getFullYear();
 let currentMonth = new Date().getMonth();
 const todayDateStr = new Date().toISOString().slice(0, 10);
 
-// 🔐 로그인 상태 확인: studentId 없으면 로그인 페이지로 이동
+// 로그인 상태 확인: studentId 없으면 로그인 페이지로 이동
 if (!localStorage.getItem("studentId")) {
   window.location.href = "login.html";
 }
@@ -78,7 +78,7 @@ function nextMonth() {
   renderCalendar(currentYear, currentMonth);
 }
 
-// 🔓 로그아웃 함수
+// 로그아웃 함수
 function logout() {
   localStorage.removeItem("studentId");
   window.location.href = "login.html";
