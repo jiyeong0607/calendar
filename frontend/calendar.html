@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>캘린더</title>
-  <style>
+  <style>  <!--css 꾸미기-->
     body {
       font-family: 'Arial', sans-serif;
       background-color: #fdfcf5; /* 상아색 */
@@ -136,10 +136,10 @@
 <body>
   <div class="calendar-container">
     <div class="calendar-header">
-      <button onclick="prevMonth()">&larr;</button>
+    <button onclick="prevMonth()">&larr;</button> <!--직전달이동-->
       <h2 id="monthTitle"></h2>
       <div>
-        <button onclick="nextMonth()">&rarr;</button>
+        <button onclick="nextMonth()">&rarr;</button> <!--다음달이동버튼-->
         <button class="logout-btn" onclick="logout()">로그아웃</button>
       </div>
     </div>
@@ -153,17 +153,17 @@
     </table>
   </div>
 
-  <div id="popup" class="popup">
+  <div id="popup" class="popup"> <!--팝업에 대한 html 설정-->
     <span style="float:right; cursor:pointer;" onclick="closePopup()">X</span>
     <h3 id="popupTitle"></h3>
     <h4>할 일 목록</h4>
     <ul id="todoList"></ul>
-    <input id="newTodo" placeholder="할 일 입력">
+    <input id="newTodo" placeholder="할 일 입력"> <!--할일 추가-->
     <button id="addTodoBtn">+할 일 추가</button>
   </div>
 
   <script>
-    function logout() {
+    function logout() { <!--로그아웃시 학번 지우고 로그인화면으로 이동-->
       localStorage.removeItem("studentId");
       window.location.href = "login.html";
     }
