@@ -4,13 +4,15 @@ import pandas as pd
 import os
 
 app = Flask(__name__)
-CORS(app)
+CORS(app)  # CORS 허용 (프론트랑 백 연결될 수 있게)
 
+# 파일 경로들 미리 지정
 basedir = os.path.abspath(os.path.dirname(__file__))
 CSV_USER_PATH = os.path.join(basedir, 'db', 'user.csv')
 CSV_TODO_PATH = os.path.join(basedir, 'db', 'todolist.csv')
 CSV_STATUS_PATH = os.path.join(basedir, 'db', 'task_status.csv')
 
+# 로그인 기능
 @app.route('/api/login', methods=['POST'])
 def login():
     try:
@@ -29,6 +31,7 @@ def login():
     user = df[(df['student_id'] == student_id) & (df['password'] == password)]
     return jsonify(success=not user.empty)
 
+# 사용자 일정 추가
 @app.route('/api/schedule', methods=['POST'])
 def add_schedule():
     print("일정 추가 호출됨")
@@ -37,6 +40,7 @@ def add_schedule():
     date = str(data.get("date"))
     title = str(data.get("title"))
 
+    # 사용자 확인
     try:
         users_df = pd.read_csv(CSV_USER_PATH, dtype=str)
     except Exception as e:
@@ -45,6 +49,7 @@ def add_schedule():
     if users_df[users_df['student_id'] == student_id].empty:
         return jsonify(success=False, error="사용자 없음"), 404
 
+    # todo 불러오기
     try:
         todos_df = pd.read_csv(CSV_TODO_PATH, dtype=str)
     except FileNotFoundError:
@@ -69,6 +74,7 @@ def add_schedule():
 
     return jsonify(success=True)
 
+# 특정 날짜의 일정들 불러오기
 @app.route('/api/todos', methods=['GET'])
 def get_todos():
     date = request.args.get("date")
@@ -88,6 +94,7 @@ def get_todos():
 
     return jsonify(result)
 
+# 일정 추가 (공용 or 미로그인 용도 등)
 @app.route('/api/todos', methods=['POST'])
 def create_todo():
     data = request.get_json()
@@ -102,7 +109,7 @@ def create_todo():
 
     new_todo = pd.DataFrame([{
         'id': str(new_id),
-        'user_id': "shared",
+        'user_id': "shared",  # 사용자 구분 없이 저장됨
         'title': data.get("content", ""),
         'due_date': data.get("date", "")
     }])
@@ -112,6 +119,7 @@ def create_todo():
 
     return jsonify(success=True)
 
+# 일정 삭제
 @app.route('/api/todos/<int:todo_id>', methods=['DELETE'])
 def delete_todo(todo_id):
     try:
@@ -123,6 +131,7 @@ def delete_todo(todo_id):
     todos_df.to_csv(CSV_TODO_PATH, index=False)
     return jsonify(success=True)
 
+# 체크 여부 조회
 @app.route('/api/status/<student_id>', methods=['GET'])
 def get_status(student_id):
     try:
@@ -136,6 +145,7 @@ def get_status(student_id):
         for _, row in filtered.iterrows()
     ])
 
+# 체크 여부 업데이트
 @app.route('/api/status', methods=['POST'])
 def update_status():
     data = request.get_json()
@@ -162,13 +172,16 @@ def update_status():
     df.to_csv(CSV_STATUS_PATH, index=False)
     return jsonify(success=True)
 
+# 기본 페이지(login.html) 서비스
 @app.route('/')
 def serve_login():
     return send_from_directory('frontend', 'login.html')
 
+# 정적 파일 서비스 (html, js 등)
 @app.route('/<path:path>')
 def serve_static(path):
     return send_from_directory('frontend', path)
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5000)  # 외부에서 접속 가능하게 0.0.0.0으로 설정
+
