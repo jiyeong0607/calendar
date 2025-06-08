@@ -107,7 +107,7 @@ window.addEventListener("DOMContentLoaded", () => {
           if (data.success) {
             input.value = "";
             loadTodos();
-            renderCalendar(currentYear, currentMonth); // ✅ 색상 강조 반영
+            renderCalendar(currentYear, currentMonth); 색상 강조 반영
           } else {
             alert("일정 추가 실패: " + (data.error || "서버 오류"));
           }
