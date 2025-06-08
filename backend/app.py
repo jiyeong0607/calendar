@@ -31,7 +31,7 @@ def login():
 
 @app.route('/api/schedule', methods=['POST'])
 def add_schedule():
-    print("🔥 일정 추가 호출됨")
+    print("일정 추가 호출됨")
     data = request.get_json()
     student_id = str(data.get("studentId"))
     date = str(data.get("date"))
